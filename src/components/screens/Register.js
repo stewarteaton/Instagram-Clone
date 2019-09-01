@@ -8,7 +8,7 @@ export class Register extends Component {
         super();
         this.state = {
             credentials: {
-                login: '',
+                email: '',
                 password: '',
             }
         };
@@ -35,9 +35,14 @@ export class Register extends Component {
         })
         .then(response => response.json())
         .then(jsonResponse => {
-            console.log(JSON.stringify(jsonResponse));
-        }).catch(err => {
-            alert('error');
+            if (jsonResponse.confirmation === 'Success!'){
+                this.props.navigation.navigate('main')
+            } else {
+                throw new Error({message: 'something went wrong; please try again '})
+            }
+        })
+        .catch(err => {
+            alert(err.errors);
         })
         
     }
@@ -48,8 +53,8 @@ export class Register extends Component {
             <View style={{height: 100 + '%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(100,100,100)'}}
                                 >
                 <Text>REGISTER PAGE</Text>
-                <TextInput value={this.state.login} onChangeText={text => this.updateText(text, 'login')} placeholder="Username" style={styles.input}/>
-                <TextInput value={this.state.login} onChangeText={text => this.updateText(text, 'password')} secureTextEntry placeholder="Password" style={styles.input}/>
+                <TextInput value={this.state.email} onChangeText={text => this.updateText(text, 'email')} placeholder="Username" style={styles.input}/>
+                <TextInput value={this.state.password} onChangeText={text => this.updateText(text, 'password')} secureTextEntry placeholder="Password" style={styles.input}/>
                 <Button title="Signup" onPress={() =>{this.register();}} />
             </View>
         );

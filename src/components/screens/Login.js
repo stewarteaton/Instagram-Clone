@@ -12,7 +12,7 @@ export class Login extends Component {
         return (
             // eslint-disable-next-line react-native/no-inline-styles
             <TouchableOpacity style={{height: 100 +'%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center'}}
-                                onPress={this.login()}>
+                                onPress={() => this.login()}>
                 <Text>New User?</Text>
             </TouchableOpacity>
         );

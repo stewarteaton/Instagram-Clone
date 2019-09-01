@@ -18,6 +18,7 @@ const IntroStack = createStackNavigator({
 const MainStack = createSwitchNavigator({
     login: IntroStack,
     main: Tabs,
+
     // login: {screen: Login},
     // main: {screen: Tabs},
 });
