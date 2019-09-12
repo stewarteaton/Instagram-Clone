@@ -1,23 +1,92 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Button} from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity, TextInput, Button} from 'react-native';
+import config from '../../config/index';
 
 
 export class Login extends Component {
+    constructor(){
+        super();
+        this.state = {
+            credentials: {
+                email: '',
+                password: '',
+            }
+        };
+    }
+
+    updateText(text, field) {
+        // must assign object because nested
+        let newCredentials = Object.assign(this.state.credentials);
+        newCredentials[field] = text;
+        this.setState({
+            credentials: newCredentials,
+        })
+    }
+
     login(){
-        // navigate to main feed by key when clicked
-        this.props.navigation.navigate('register');
+        //send credentials to server
+        fetch(config.baseUrl + '/login', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(this.state.credentials)
+        })
+        .then(response => response.json())
+        .then(jsonResponse => {
+            console.log(jsonResponse);
+            if (jsonResponse.error != null){
+                console.log('aaaa');
+                Alert.alert('Error', jsonResponse.error,
+                    [
+                    {text: 'OK', onPress: () => console.log(jsonResponse.error)},
+                    ],
+                    {cancelable: false},
+                )
+            } 
+            if (jsonResponse.confirmation === 'Success!'){
+                this.props.navigation.navigate('main')
+            } 
+        })
+        .catch(err => {
+            // Works on both iOS and Android
+            Alert.alert(
+                'Alert Title',
+                'My Alert Msg',
+                [
+                {text: 'OK', onPress: () => console.log(err)},
+                ],
+                {cancelable: false},
+             );
+            // Alert.alert(err.errors);
+        })
+        
     }
 
     render() {
         return (
             // eslint-disable-next-line react-native/no-inline-styles
-            <TouchableOpacity style={{height: 100 +'%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center'}}
-                                onPress={() => this.login()}>
-                <Text>New User?</Text>
-            </TouchableOpacity>
+            <View style={{height: 100 + '%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(100,100,100)'}}
+                                >
+                <Text>Login PAGE</Text>
+                <TextInput value={this.state.email} onChangeText={text => this.updateText(text, 'email')} placeholder="Email" style={styles.input}/>
+                <TextInput value={this.state.password} onChangeText={text => this.updateText(text, 'password')} secureTextEntry placeholder="Password" style={styles.input}/>
+                <Button title="Login" onPress={() =>{this.login();}} />
+                <Button title="New User? Sign up here" onPress={() => this.props.navigation.navigate('register')} />
+            </View>
         );
     }
 }
 
+const styles = StyleSheet.create({
+    input: {
+        height: 50,
+        width: 100 + '%',
+        paddingHorizontal: 50,
+        backgroundColor: 'white',
+        marginBottom: 10,
+    }
+});
 export default Login;
 

@@ -80,4 +80,28 @@ app.post('/signup', (req, res) => {
         })
 });
 
+app.post('/login', (req, res) => {
+    const user = {
+        email: req.body.email,
+        password: req.body.password,
+    };
+
+    const { valid , errors } = validateLoginData(user);
+    if (!valid) return res.status(400).json(errors);
+    
+    firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+        .then(data => {
+            res.json({confirmation: 'Success!' });
+            return data.user.getIdToken();
+        })
+        .then(token => {
+            return res.json({token});
+        }) 
+        .catch(error => {
+            console.log(error);
+            // can implement auth/wrong-password & auth/user-not-user
+            return res.status(403).json({ error: "Wrong username/password, please try again" });
+        });
+})
+
 exports.api = functions.https.onRequest(app);

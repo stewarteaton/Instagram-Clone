@@ -1,7 +1,5 @@
 node_modules/
 
 .env
-.serviceAccount
-.serviceAccount.json
 
 serviceAccount.json

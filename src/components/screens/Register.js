@@ -70,7 +70,7 @@ export class Register extends Component {
             <View style={{height: 100 + '%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(100,100,100)'}}
                                 >
                 <Text>REGISTER PAGE</Text>
-                <TextInput value={this.state.email} onChangeText={text => this.updateText(text, 'email')} placeholder="Username" style={styles.input}/>
+                <TextInput value={this.state.email} onChangeText={text => this.updateText(text, 'email')} placeholder="Email" style={styles.input}/>
                 <TextInput value={this.state.password} onChangeText={text => this.updateText(text, 'password')} secureTextEntry placeholder="Password" style={styles.input}/>
                 <Button title="Signup" onPress={() =>{this.register();}} />
             </View>
