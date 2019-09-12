@@ -16,12 +16,12 @@ exports.validateSignupData = (data) => {
     let errors = {};
 
     if (isEmpty(data.email)) {
-        errors.email = "Must not be empty";
+        errors.error = "Email field must not be empty";
     } else if(!isEmail(data.email)) {
-        errors.email = "Email address isn't valid";
+        errors.error = "Email address isn't valid";
     } 
 
-    if (isEmpty(data.password)) errors.password = "Must not be empty";
+    if (isEmpty(data.password)) errors.error = "Must not be empty";
 
     // returns true if there is no errors 
     return {
@@ -33,8 +33,8 @@ exports.validateSignupData = (data) => {
 exports.validateLoginData = (data) => {
     let errors = {};
 
-        if (isEmpty(data.email)) errors.email = "Must not be empty";
-        if (isEmpty(data.password)) errors.password = "Must not be empty";
+        if (isEmpty(data.email)) errors.error = "Must not be empty";
+        if (isEmpty(data.password)) errors.error = "Must not be empty";
     
         return {
             errors,

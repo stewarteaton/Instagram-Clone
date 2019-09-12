@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Button} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Button, Alert} from 'react-native';
 import config from '../../config/index';
 
 export class Register extends Component {
@@ -35,14 +35,31 @@ export class Register extends Component {
         })
         .then(response => response.json())
         .then(jsonResponse => {
+            console.log(jsonResponse);
+            if (jsonResponse.error != null){
+                console.log('aaaa');
+                Alert.alert('Error', jsonResponse.error, 
+                [
+                    {text: 'OK', onPress: () => console.log(jsonResponse.error)},
+                    ],
+                    {cancelable: false},
+                )
+            } 
             if (jsonResponse.confirmation === 'Success!'){
                 this.props.navigation.navigate('main')
-            } else {
-                throw new Error({message: 'something went wrong; please try again '})
-            }
+            } 
         })
         .catch(err => {
-            alert(err.errors);
+            // Works on both iOS and Android
+            Alert.alert(
+                'Alert Title',
+                'My Alert Msg',
+                [
+                {text: 'OK', onPress: () => console.log(err)},
+                ],
+                {cancelable: false},
+            );
+            // Alert.alert(err.errors);
         })
         
     }

@@ -1,5 +1,7 @@
 # database config
 .env
+.serviceAccount
+.serviceAccount.json
 
 # Logs
 logs
