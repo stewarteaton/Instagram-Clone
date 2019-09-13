@@ -2,6 +2,11 @@
   package="com.instaclone">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- added by me for react camera -->
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
       android:name=".MainApplication"

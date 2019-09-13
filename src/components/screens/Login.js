@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity, TextInput, Button} from 'react-native';
+import { View, Text, StyleSheet, Alert, TextInput, Button} from 'react-native';
 import config from '../../config/index';
 
 
@@ -10,7 +10,7 @@ export class Login extends Component {
             credentials: {
                 email: '',
                 password: '',
-            }
+            },
         };
     }
 
@@ -20,7 +20,7 @@ export class Login extends Component {
         newCredentials[field] = text;
         this.setState({
             credentials: newCredentials,
-        })
+        });
     }
 
     login(){
@@ -31,7 +31,7 @@ export class Login extends Component {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(this.state.credentials)
+            body: JSON.stringify(this.state.credentials),
         })
         .then(response => response.json())
         .then(jsonResponse => {
@@ -43,25 +43,21 @@ export class Login extends Component {
                     {text: 'OK', onPress: () => console.log(jsonResponse.error)},
                     ],
                     {cancelable: false},
-                )
-            } 
+                );
+            }
             if (jsonResponse.confirmation === 'Success!'){
-                this.props.navigation.navigate('main')
-            } 
+                this.props.navigation.navigate('main');
+            }
         })
         .catch(err => {
-            // Works on both iOS and Android
-            Alert.alert(
-                'Alert Title',
-                'My Alert Msg',
-                [
-                {text: 'OK', onPress: () => console.log(err)},
-                ],
-                {cancelable: false},
-             );
-            // Alert.alert(err.errors);
-        })
-        
+            console.log(err.error);
+        //     Alert.alert('Error', err.error,
+        //             [
+        //             {text: 'OK', onPress: () => console.log(err.error)},
+        //             ],
+        //             {cancelable: false},
+        //         );
+        });
     }
 
     render() {
@@ -70,8 +66,8 @@ export class Login extends Component {
             <View style={{height: 100 + '%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(100,100,100)'}}
                                 >
                 <Text>Login PAGE</Text>
-                <TextInput value={this.state.email} onChangeText={text => this.updateText(text, 'email')} placeholder="Email" style={styles.input}/>
-                <TextInput value={this.state.password} onChangeText={text => this.updateText(text, 'password')} secureTextEntry placeholder="Password" style={styles.input}/>
+                <TextInput autoCapitalize="none" value={this.state.email} onChangeText={text => this.updateText(text, 'email')} placeholder="Email" style={styles.input}/>
+                <TextInput autoCapitalize="none" value={this.state.password} onChangeText={text => this.updateText(text, 'password')} secureTextEntry placeholder="Password" style={styles.input}/>
                 <Button title="Login" onPress={() =>{this.login();}} />
                 <Button title="New User? Sign up here" onPress={() => this.props.navigation.navigate('register')} />
             </View>
@@ -86,7 +82,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 50,
         backgroundColor: 'white',
         marginBottom: 10,
-    }
+    },
 });
 export default Login;
 
