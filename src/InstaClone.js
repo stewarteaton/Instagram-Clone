@@ -28,7 +28,6 @@ const AppContainer = createAppContainer(MainStack);
 class InstaClone extends Component {
     render(){
         return (
-            // <Login />
             <AppContainer />
         );
     }

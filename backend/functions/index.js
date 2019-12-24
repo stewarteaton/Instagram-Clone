@@ -4,6 +4,18 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
 const serviceAccount = require('./serviceAccount');
+const cloudinary = require('cloudinary');
+
+const bodyParser = require('body-parser')
+
+
+//cloudinary is free cloud server used for hosting img, videos, and pdfs
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -27,6 +39,12 @@ firebase.initializeApp(firebaseConfig);
 
 const express = require('express');
 const app = express();
+app.use(
+    bodyParser.urlencoded({
+      extended: true
+    })
+  );
+app.use(bodyParser.json())
 
 
 const { validateSignupData, validateLoginData, reduceUserDetails } = require('./validators');
@@ -78,6 +96,7 @@ app.post('/signup', (req, res) => {
             console.error(error.message);  
             res.status(500).json({ error: 'something went wrong' });
         })
+        return null;
 });
 
 app.post('/login', (req, res) => {
@@ -91,17 +110,92 @@ app.post('/login', (req, res) => {
     
     firebase.auth().signInWithEmailAndPassword(user.email, user.password)
         .then(data => {
-            res.json({confirmation: 'Success!' });
-            return data.user.getIdToken();
+            return res.json({confirmation: 'Success!' , data: data});
+            // return data.user.getIdToken();
         })
         .then(token => {
-            return res.json({token});
+            // return res.json({token});
+            return ;
+
         }) 
         .catch(error => {
             console.log(error);
             // can implement auth/wrong-password & auth/user-not-user
             return res.status(403).json({ error: "Wrong username/password, please try again" });
         });
+
+        return null;
 })
+
+// For camera
+// Upload to Cloudinary
+app.post('/cloudinary/:id/photo', (req, res) => {
+    console.log("\nUID "+ req.params.id);
+    // Add file to cloudinary
+    cloudinary.v2.uploader.upload(req.body.uri.substr(5), {
+        folder: req.params.id,
+        use_filename:true,
+        unique_filename: false
+    })
+    .then((result) => {
+        // Gets url for new pdf uploaded and stores the address with document in database
+        console.log("Successfully Pushed to Cloudinary!")
+        console.log(result.url);
+        req.body.cdnURL = result.url;
+        console.log(req.body.cdnURL);
+        //to move on to next piece of middleware
+        return res.json(result);
+        // return result;
+    })
+    .catch(() => {
+        console.log("Error pushing to cloudinary")
+    });
+});
+
+// ADD user's cloudinary photo URL to Firebase
+app.post('/users/:id/photo', (req, res) => {
+    console.log(req.body.url);
+        // Add cloud URL to user's Firebase 
+    const newImg = {
+        url: req.body.url,
+        userID: req.params.id,
+        createdAt: new Date().toISOString(),
+    };
+    console.dir(newImg);
+      db.collection('pictures')
+        .add(newImg)
+        .then(doc => {
+            const resPost = newImg;
+            // you can edit a key in a const, but cannot change data type
+            resPost.picID = doc.id;
+            return res.json(resPost);  
+        })
+        .catch(error => {
+            res.status(500).json({ error: 'something went wrong' });
+            console.error(error);  
+        })
+});
+
+app.get('/users/:id/photos', (req, res) => {
+    console.log('FETCHING USER PHOTOS!');
+    console.log(req.params.id);
+        db.collection('pictures')
+        .orderBy('createdAt','desc') //lists pictures in most recent order
+        .get()
+        .then((data) => {
+            let pictures = [];
+            data.forEach((doc) => {
+                console.log('Doc: ' + doc.data());
+                    pictures.push({
+                        picURL: doc.data().url,
+                        createdAt: doc.data().createdAt,
+                    });
+            
+            });
+            return res.json(pictures);
+        }).catch(error => console.error(error));
+    });
+
+
 
 exports.api = functions.https.onRequest(app);

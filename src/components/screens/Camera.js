@@ -1,9 +1,18 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { PureComponent } from 'react';
-import { AppRegistry, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
+import config from '../../config';
+import axios from 'axios';
+import { connect } from 'react-redux';
+
 
 class Camera extends PureComponent {
-  render() {
+  constructor(props){
+    super(props);
+  }
+
+  render(){
     return (
       <View style={styles.container}>
         <RNCamera
@@ -31,23 +40,52 @@ class Camera extends PureComponent {
         />
         <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
           <TouchableOpacity onPress={this.takePicture.bind(this)} style={styles.capture}>
-            <Text style={{ fontSize: 14 }}> SNAP </Text>
+            <Text style={{ fontSize: 14 }}>SNAP</Text>
           </TouchableOpacity>
         </View>
       </View>
     );
   }
 
-  takePicture = async() => {
-    if (this.camera) {
-      const options = { quality: 0.5, base64: true };
-      const data = await this.camera.takePictureAsync(options).catch(error => {
-        console.log(error);
-      });
-      console.log(data.uri);
+
+    takePicture = async() => {
+      if (this.camera) {
+          const options = { quality: 0.5, base64: true };
+          const picData = await this.camera.takePictureAsync(options).catch(error => {
+            console.log(error);
+          });
+          console.log(picData);
+        var cloudURL;
+        await axios.post(config.baseUrl + `/cloudinary/${this.props.user.id}/photo`, picData).then((response) => {
+            console.log('worked');
+            console.log(response.data.url);
+            cloudURL = (response.data.url);
+          })
+          .catch((error) => {
+            console.log('did not work');
+            console.log(error);
+        });
+
+        // Add url to Firebase
+        await axios.post(config.baseUrl + `/users/${this.props.user.id}/photo`, {url: cloudURL}).then((response) => {
+          console.log('fire url worked');
+          console.log(response);
+        const myjson = response.data;
+        const { data } = myjson;
+
+        this.props.navigation.navigate('profile', {
+          newPic: data,
+        });
+      })
+        .catch((error) => {
+          console.log('did not work');
+          console.log(error);
+        });
     }
-  };
+  }
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -71,6 +109,16 @@ const styles = StyleSheet.create({
   },
 });
 
+const mapStateToProps = (state) => {
+  return {
+      user: state.account.user,
+  }
+};
 
-export default Camera;
+const dispatchToProps = dispatch => {
+  return {
 
+  };
+};
+
+export default connect(mapStateToProps, dispatchToProps)(Camera);

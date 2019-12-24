@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Button, Alert} from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, Alert} from 'react-native';
 import config from '../../config/index';
 
 export class Register extends Component {
@@ -10,17 +10,17 @@ export class Register extends Component {
             credentials: {
                 email: '',
                 password: '',
-            }
+            },
         };
     }
 
-    updateText(text, field){  
+    updateText(text, field){
         // must assign object because nested
         let newCredentials = Object.assign(this.state.credentials);
         newCredentials[field] = text;
         this.setState({
             credentials: newCredentials,
-        })
+        });
     }
 
     register(){
@@ -31,23 +31,22 @@ export class Register extends Component {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(this.state.credentials)
+            body: JSON.stringify(this.state.credentials),
         })
         .then(response => response.json())
         .then(jsonResponse => {
             console.log(jsonResponse);
             if (jsonResponse.error != null){
-                console.log('aaaa');
-                Alert.alert('Error', jsonResponse.error, 
+                Alert.alert('Error', jsonResponse.error,
                 [
                     {text: 'OK', onPress: () => console.log(jsonResponse.error)},
                     ],
                     {cancelable: false},
-                )
-            } 
+                );
+            }
             if (jsonResponse.confirmation === 'Success!'){
-                this.props.navigation.navigate('main')
-            } 
+                this.props.navigation.navigate('main');
+            }
         })
         .catch(err => {
             // Works on both iOS and Android
@@ -59,17 +58,14 @@ export class Register extends Component {
                 ],
                 {cancelable: false},
             );
-            // Alert.alert(err.errors);
-        })
-        
+        });
     }
 
     render() {
         return (
             // eslint-disable-next-line react-native/no-inline-styles
-            <View style={{height: 100 + '%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(100,100,100)'}}
-                                >
-                <Text>REGISTER PAGE</Text>
+            <View style={{height: 100 + '%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(75,75,75)'}}>
+                <Text style={styles.registerTitle}>Register</Text>
                 <TextInput value={this.state.email} onChangeText={text => this.updateText(text, 'email')} placeholder="Email" style={styles.input}/>
                 <TextInput value={this.state.password} onChangeText={text => this.updateText(text, 'password')} secureTextEntry placeholder="Password" style={styles.input}/>
                 <Button title="Signup" onPress={() =>{this.register();}} />
@@ -85,6 +81,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 50,
         backgroundColor: 'white',
         marginBottom: 10,
+    },
+    registerTitle: {
+        marginBottom: 20 + '%',
+        fontSize: 30,
+        color: 'white',
     }
 });
 export default Register;

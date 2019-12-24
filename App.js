@@ -6,24 +6,20 @@
  * @flow
  */
 
-import React, {Fragment, Component } from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import React, {Component} from 'react';
 
 import InstaClone from './src/InstaClone.js';
+import store from './src/redux/stores/index.js';
+import {Provider} from 'react-redux';
 
 export default class App extends Component {
-  render(){
+  render() {
+    // Wrap app in redux store
     return (
+      <Provider store={store}>
         <InstaClone />
+      </Provider>
+      // <InstaClone />
     );
   }
 }
-
-

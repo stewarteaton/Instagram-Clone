@@ -3,7 +3,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 target 'instaClone' do
   # Pods for instaClone
-  pod 'React', :path => '../node_modules/react-native/'
+  pod 'React', :path => '../node_modules/react-native'
   pod 'React-Core', :path => '../node_modules/react-native/React'
   pod 'React-DevSupport', :path => '../node_modules/react-native/React'
   pod 'React-RCTActionSheet', :path => '../node_modules/react-native/Libraries/ActionSheetIOS'
@@ -27,7 +27,8 @@ target 'instaClone' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+  # added manually for RN camera
+  pod 'react-native-camera', path: '../node_modules/react-native-camera'
 
   target 'instaCloneTests' do
     inherit! :search_paths
@@ -45,4 +46,12 @@ target 'instaClone-tvOS' do
     # Pods for testing
   end
 
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    if target.name == "React"
+      target.remove_from_project
+    end
+  end
 end

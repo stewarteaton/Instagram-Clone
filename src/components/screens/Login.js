@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Alert, TextInput, Button} from 'react-native';
 import config from '../../config/index';
+import actions from '../../redux/actions';
+import { connect } from 'react-redux';
 
 
 export class Login extends Component {
@@ -37,7 +39,6 @@ export class Login extends Component {
         .then(jsonResponse => {
             console.log(jsonResponse);
             if (jsonResponse.error != null){
-                console.log('aaaa');
                 Alert.alert('Error', jsonResponse.error,
                     [
                     {text: 'OK', onPress: () => console.log(jsonResponse.error)},
@@ -46,7 +47,10 @@ export class Login extends Component {
                 );
             }
             if (jsonResponse.confirmation === 'Success!'){
-                this.props.navigation.navigate('main');
+                // dispatch user data to redux store
+                console.log(jsonResponse);
+                this.props.userRecieved(jsonResponse);
+                this.props.navigation.navigate({routeName: 'main', params: {user: jsonResponse}});
             }
         })
         .catch(err => {
@@ -63,9 +67,8 @@ export class Login extends Component {
     render() {
         return (
             // eslint-disable-next-line react-native/no-inline-styles
-            <View style={{height: 100 + '%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(100,100,100)'}}
-                                >
-                <Text>Login PAGE</Text>
+            <View style={{height: 100 + '%', width: 100 + '%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgb(75,75,75)'}}>
+                <Text style={styles.loginTitle}>Login</Text>
                 <TextInput autoCapitalize="none" value={this.state.email} onChangeText={text => this.updateText(text, 'email')} placeholder="Email" style={styles.input}/>
                 <TextInput autoCapitalize="none" value={this.state.password} onChangeText={text => this.updateText(text, 'password')} secureTextEntry placeholder="Password" style={styles.input}/>
                 <Button title="Login" onPress={() =>{this.login();}} />
@@ -83,6 +86,25 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginBottom: 10,
     },
+    loginTitle: {
+        marginBottom: 20 + '%',
+        fontSize: 30,
+        color: 'white',
+    }
 });
-export default Login;
+
+const mapStateToProps = state => {
+    return {
+
+    }
+}
+
+const dispatchToProps = dispatch => {
+    return {
+        userRecieved: (user) => dispatch(actions.userRecieved(user)),
+    };
+}
+
+
+export default connect(mapStateToProps, dispatchToProps)(Login);
 
